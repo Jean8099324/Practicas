@@ -8,10 +8,11 @@
 
 <body style="background: #150D48; color: #fff; font-family: Arial; padding: 2rem;">
 
-    <h1>Hola, <span th:text="${nombre}"></span>!</h1>
-
-    <p>Mi primera aplicación Spring Boot está corriendo.</p>
-
+    <h2>Cursos Disponibles</h2>
+    <ul>
+        <li th:each="c : ${cursos}" th: text="${c}"></li>
+    <ul>
+        
 </body>
 
 </html>
