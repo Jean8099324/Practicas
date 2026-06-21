@@ -8,6 +8,9 @@
 
 <body style="background: #150D48; color: #fff; font-family: Arial; padding: 2rem;">
 
+    <div th:fragment="fragments/header :: menu"></div>
+
+
     <h2>Cursos Disponibles</h2>
     <ul>
         <li th:each="c : ${cursos}" th: text="${c}"></li>
