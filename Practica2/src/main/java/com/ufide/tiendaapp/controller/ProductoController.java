@@ -21,111 +21,155 @@ import jakarta.validation.Valid;
  * Controlador de productos.
  *
  * Recibe peticiones HTTP, llama al ProductoService y devuelve la vista.
- * Cero logica de negocio aqui - solo orquesta.
  */
 @Controller
 @RequestMapping("/productos")
 public class ProductoController {
 
-    @Autowired
-    private ProductoService productoService;
+        @Autowired
+        private ProductoService productoService;
 
-    /** GET /productos - listar todos o buscar por nombre/categoria */
-    @GetMapping
-    public String listar(Model modelo,
-            @RequestParam(required = false) String buscar,
-            @RequestParam(required = false) String categoria) {
+        /** GET /productos - listar todos o buscar por nombre/categoria */
+        @GetMapping
+        public String listar(Model modelo,
+                        @RequestParam(required = false) String buscar,
+                        @RequestParam(required = false) String categoria) {
 
-        if (buscar != null && !buscar.isBlank()) {
-            modelo.addAttribute("productos", productoService.buscarPorNombre(buscar));
-            modelo.addAttribute("filtro", "Buscando: " + buscar);
-        } else if (categoria != null && !categoria.isBlank()) {
-            modelo.addAttribute("productos", productoService.buscarPorCategoria(categoria));
-            modelo.addAttribute("filtro", "Categoria: " + categoria);
-        } else {
-            modelo.addAttribute("productos", productoService.listar());
+                if (buscar != null && !buscar.isBlank()) {
+
+                        modelo.addAttribute("productos",
+                                        productoService.buscarPorNombre(buscar));
+
+                        modelo.addAttribute("filtro",
+                                        "Buscando: " + buscar);
+
+                } else if (categoria != null && !categoria.isBlank()) {
+
+                        modelo.addAttribute("productos",
+                                        productoService.buscarPorCategoria(categoria));
+
+                        modelo.addAttribute("filtro",
+                                        "Categoría: " + categoria);
+
+                } else {
+
+                        modelo.addAttribute("productos",
+                                        productoService.listar());
+                }
+
+                return "productos";
         }
 
-        return "productos";
-    }
+        /** GET /productos/{id} - ver detalle de un producto */
+        @GetMapping("/{id}")
+        public String detalle(Model modelo, @PathVariable Long id) {
 
-    /** GET /productos/{id} - ver detalle de un producto */
-    @GetMapping("/{id}")
-    public String detalle(Model modelo, @PathVariable Long id) {
-        modelo.addAttribute("producto", productoService.buscarPorId(id).orElse(null));
-        return "producto";
-    }
+                modelo.addAttribute(
+                                "producto",
+                                productoService.buscarPorId(id).orElse(null));
 
-    /** GET /productos/bajo-stock - productos con menos de 5 unidades */
-    @GetMapping("/bajo-stock")
-    public String bajoStock(Model modelo) {
-        modelo.addAttribute("productos", productoService.bajoStock());
-        modelo.addAttribute("filtro", "Productos con bajo stock");
-        return "productos";
-    }
-
-    /** FORMULARIO NUEVO PRODUCTO */
-    @GetMapping("/nuevo")
-    public String mostrarFormNuevo(Model modelo) {
-        modelo.addAttribute("producto", new Producto());
-        return "productos/form";
-    }
-
-    /** GUARDAR NUEVO PRODUCTO */
-    @PostMapping
-    public String guardar(@Valid @ModelAttribute("producto") Producto producto,
-                          BindingResult result,
-                          RedirectAttributes ra) {
-
-        if (result.hasErrors()) {
-            return "productos/form";
+                return "producto";
         }
 
-        productoService.guardar(producto);
-        ra.addFlashAttribute("ok", "Producto guardado correctamente");
+        /** GET /productos/bajo-stock - productos con menos de 5 unidades */
+        @GetMapping("/bajo-stock")
+        public String bajoStock(Model modelo) {
 
-        return "redirect:/productos";
-    }
+                modelo.addAttribute(
+                                "productos",
+                                productoService.bajoStock());
 
-    /** FORMULARIO EDITAR PRODUCTO */
-    @GetMapping("/{id}/editar")
-    public String mostrarFormEditar(@PathVariable Long id, Model modelo) {
+                modelo.addAttribute(
+                                "filtro",
+                                "Productos con bajo stock");
 
-        Producto producto = productoService.buscarPorId(id)
-                .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
-
-        modelo.addAttribute("producto", producto);
-
-        return "productos/form";
-    }
-
-    /** ACTUALIZAR PRODUCTO */
-    @PostMapping("/{id}")
-    public String actualizar(@PathVariable Long id,
-                             @Valid @ModelAttribute("producto") Producto producto,
-                             BindingResult result,
-                             RedirectAttributes ra) {
-
-        if (result.hasErrors()) {
-            return "productos/form";
+                return "productos";
         }
 
-        producto.setId(id);
-        productoService.guardar(producto);
+        /** FORMULARIO NUEVO PRODUCTO */
+        @GetMapping("/nuevo")
+        public String mostrarFormNuevo(Model modelo) {
 
-        ra.addFlashAttribute("ok", "Producto actualizado correctamente");
+                modelo.addAttribute(
+                                "producto",
+                                new Producto());
 
-        return "redirect:/productos";
-    }
+                return "productos/form";
+        }
 
-    /** ELIMINAR PRODUCTO */
-    @PostMapping("/{id}/eliminar")
-    public String eliminar(@PathVariable Long id, RedirectAttributes ra) {
+        /** GUARDAR NUEVO PRODUCTO */
+        @PostMapping
+        public String guardar(
+                        @Valid @ModelAttribute("producto") Producto producto,
+                        BindingResult result,
+                        RedirectAttributes ra) {
 
-        productoService.eliminar(id);
+                if (result.hasErrors()) {
+                        return "productos/form";
+                }
 
-        ra.addFlashAttribute("ok", "Producto eliminado correctamente");
+                productoService.guardar(producto);
 
-        return "redirect:/productos";
-    }
+                ra.addFlashAttribute(
+                                "ok",
+                                "Producto guardado correctamente");
+
+                return "redirect:/productos";
+        }
+
+        /** FORMULARIO EDITAR PRODUCTO */
+        @GetMapping("/{id}/editar")
+        public String mostrarFormEditar(
+                        @PathVariable Long id,
+                        Model modelo) {
+
+                Producto producto = productoService
+                                .buscarPorId(id)
+                                .orElseThrow(() -> new IllegalArgumentException(
+                                                "Producto no encontrado"));
+
+                modelo.addAttribute(
+                                "producto",
+                                producto);
+
+                return "productos/form";
+        }
+
+        /** ACTUALIZAR PRODUCTO */
+        @PostMapping("/{id}")
+        public String actualizar(
+                        @PathVariable Long id,
+                        @Valid @ModelAttribute("producto") Producto producto,
+                        BindingResult result,
+                        RedirectAttributes ra) {
+
+                if (result.hasErrors()) {
+                        return "productos/form";
+                }
+
+                producto.setId(id);
+
+                productoService.guardar(producto);
+
+                ra.addFlashAttribute(
+                                "ok",
+                                "Producto actualizado correctamente");
+
+                return "redirect:/productos";
+        }
+
+        /** ELIMINAR PRODUCTO */
+        @PostMapping("/{id}/eliminar")
+        public String eliminar(
+                        @PathVariable Long id,
+                        RedirectAttributes ra) {
+
+                productoService.eliminar(id);
+
+                ra.addFlashAttribute(
+                                "ok",
+                                "Producto eliminado correctamente");
+
+                return "redirect:/productos";
+        }
 }

@@ -10,7 +10,7 @@ import com.ufide.tiendaapp.entity.Producto;
  * Repository de Producto.
  *
  * Extiende JpaRepository<Entidad, TipoDelId> y obtiene gratis:
- *   findAll, findById, save, deleteById, count, existsById, etc.
+ * findAll, findById, save, deleteById, count, existsById, etc.
  *
  * Spring genera la implementacion automaticamente al arrancar.
  * No hay que escribir codigo - solo declarar la interface.

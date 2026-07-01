@@ -15,11 +15,12 @@ import jakarta.validation.constraints.Size;
  * Entidad Producto - representa la tabla productos en MySQL.
  *
  * Anotaciones JPA:
- *   @Entity        -> marca la clase como tabla
- *   @Table         -> nombre custom de la tabla
- *   @Id            -> llave primaria
- *   @GeneratedValue -> auto-incremento
- *   @Column        -> configuracion de la columna
+ * 
+ * @Entity -> marca la clase como tabla
+ * @Table -> nombre custom de la tabla
+ * @Id -> llave primaria
+ * @GeneratedValue -> auto-incremento
+ * @Column -> configuracion de la columna
  */
 @Entity
 @Table(name = "productos")
@@ -51,7 +52,8 @@ public class Producto {
     private String categoria;
 
     /** Constructor vacio - obligatorio para JPA. */
-    public Producto() {}
+    public Producto() {
+    }
 
     public Producto(String nombre, String descripcion, double precio, int stock, String categoria) {
         this.nombre = nombre;
@@ -63,23 +65,53 @@ public class Producto {
 
     // Getters y setters
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getDescripcion() { return descripcion; }
-    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    public String getNombre() {
+        return nombre;
+    }
 
-    public double getPrecio() { return precio; }
-    public void setPrecio(double precio) { this.precio = precio; }
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
-    public int getStock() { return stock; }
-    public void setStock(int stock) { this.stock = stock; }
+    public String getDescripcion() {
+        return descripcion;
+    }
 
-    public String getCategoria() { return categoria; }
-    public void setCategoria(String categoria) { this.categoria = categoria; }
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public double getPrecio() {
+        return precio;
+    }
+
+    public void setPrecio(double precio) {
+        this.precio = precio;
+    }
+
+    public int getStock() {
+        return stock;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
+    }
 
     /** Util: marca si hay poco stock. */
     public boolean isBajoStock() {
