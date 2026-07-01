@@ -53,17 +53,24 @@
 
                     <td>
 
-                        @{/productos/{id}/editar(id=${p.id})}
-                        Editar
-                        </a>
+                        <a th:href="@{/productos/{id}/editar(id=${p.id})}" class>
 
-                        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#modalEliminar" th:data-id="${p.id}" th:data-nombre="${p.nombre}">
-                            Eliminar
-                        </button>
+                            
+                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminar"
+                                th:data-id="${p.id}" th:data-nombre="${p.nombre}">
+                                🗑 Eliminar
+                            </button>
 
                     </td>
 
+                    </td>
+
+                    </td>
+
+                    </td>
+                    ``
+
+                    </td>
                 </tr>
 
             </tbody>
