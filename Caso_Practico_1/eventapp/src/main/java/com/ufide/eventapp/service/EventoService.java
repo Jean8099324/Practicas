@@ -15,7 +15,8 @@ import com.ufide.eventapp.repository.EventoRepository;
  *
  * Ya viene con los metodos basicos. Si necesitas mas operaciones
  * (por ejemplo para tu endpoint con parametro), agregalas aca y NO en el
- * Controller (recordar el patron MVC: Controller llama a Service, no al Repository).
+ * Controller (recordar el patron MVC: Controller llama a Service, no al
+ * Repository).
  */
 @Service
 public class EventoService {
