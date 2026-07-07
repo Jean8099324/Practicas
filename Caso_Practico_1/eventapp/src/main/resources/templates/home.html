@@ -1,70 +1,265 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>EventApp | SC-403</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
-<body>
 
-<div th:replace="~{fragments/header :: navbar}"></div>
 
-<main class="container py-4">
-    <div class="text-center mb-5">
-        <h1 class="display-5 fw-bold">Bienvenido a EventApp</h1>
-        <p class="lead text-muted">
-            Gestion de eventos publicos (conciertos, talleres, conferencias).
-        </p>
-        <a th:href="@{/eventos}" class="btn btn-primary btn-lg">
-            <i class="bi bi-calendar-event me-2"></i>Ver catalogo de eventos
-        </a>
-    </div>
+<body class="bg-light">
 
-    <div class="row g-3">
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="bi bi-list-ul me-2 text-primary"></i>Listar eventos
-                    </h5>
-                    <p class="card-text small text-muted">
-                        Ya viene funcionando. Recorre los eventos cargados desde la BD.
+
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+
+    <main class="container py-5">
+
+
+        <!-- HERO -->
+
+        <section class="p-5 mb-5 rounded-4 shadow text-white"
+            style="background: linear-gradient(135deg,#0d6efd,#6610f2);">
+
+            <div class="row align-items-center">
+
+                <div class="col-md-8">
+
+                    <h1 class="display-4 fw-bold">
+                        Bienvenido a EventApp
+                    </h1>
+
+                    <p class="lead mt-3">
+                        Administra conciertos, talleres y conferencias
+                        desde una plataforma sencilla y moderna.
                     </p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="bi bi-eye me-2 text-primary"></i>Ver detalle
-                    </h5>
-                    <p class="card-text small text-muted">
-                        Tambien funciona. Muestra la info completa de cada evento.
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="bi bi-tools me-2 text-warning"></i>Tu trabajo
-                    </h5>
-                    <p class="card-text small text-muted">
-                        Implementar el CRUD completo + validaciones + modal + toast.
-                        Ver caso_practico_1.md.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-</main>
 
-<footer th:replace="~{fragments/header :: footer}"></footer>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+                    <a th:href="@{/eventos}" class="btn btn-light btn-lg mt-3">
+
+                        <i class="bi bi-calendar-event me-2"></i>
+                        Ver eventos
+
+                    </a>
+
+
+                </div>
+
+
+                <div class="col-md-4 text-center">
+
+                    <i class="bi bi-calendar2-week" style="font-size:120px;">
+                    </i>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ESTADISTICAS -->
+
+
+        <div class="row g-4 mb-5">
+
+
+            <div class="col-md-4">
+
+                <div class="card border-0 shadow-sm text-center h-100">
+
+                    <div class="card-body">
+
+                        <i class="bi bi-calendar-check text-primary fs-1"></i>
+
+                        <h2 class="fw-bold mt-3">
+                            Eventos
+                        </h2>
+
+                        <p class="text-muted">
+                            Consulta todos los eventos registrados.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+
+            <div class="col-md-4">
+
+                <div class="card border-0 shadow-sm text-center h-100">
+
+                    <div class="card-body">
+
+                        <i class="bi bi-people text-success fs-1"></i>
+
+                        <h2 class="fw-bold mt-3">
+                            Participantes
+                        </h2>
+
+                        <p class="text-muted">
+                            Control de cupos disponibles.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+
+
+            <div class="col-md-4">
+
+                <div class="card border-0 shadow-sm text-center h-100">
+
+                    <div class="card-body">
+
+                        <i class="bi bi-gear text-warning fs-1"></i>
+
+                        <h2 class="fw-bold mt-3">
+                            Gestión
+                        </h2>
+
+                        <p class="text-muted">
+                            Crear, editar y eliminar eventos.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+
+
+        <!-- FUNCIONES -->
+
+
+        <h2 class="text-center mb-4 fw-bold">
+            Funcionalidades
+        </h2>
+
+
+
+        <div class="row g-4">
+
+
+            <div class="col-md-4">
+
+                <div class="card shadow-sm border-0 h-100">
+
+                    <div class="card-body">
+
+                        <h5>
+                            <i class="bi bi-list-ul text-primary me-2"></i>
+                            Catálogo
+                        </h5>
+
+
+                        <p class="text-muted">
+                            Visualiza todos los eventos almacenados
+                            en la base de datos.
+                        </p>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+
+            <div class="col-md-4">
+
+                <div class="card shadow-sm border-0 h-100">
+
+                    <div class="card-body">
+
+                        <h5>
+                            <i class="bi bi-eye text-success me-2"></i>
+                            Detalles
+                        </h5>
+
+
+                        <p class="text-muted">
+                            Consulta información completa:
+                            fecha, lugar, precio y cupos.
+                        </p>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+
+            <div class="col-md-4">
+
+                <div class="card shadow-sm border-0 h-100">
+
+                    <div class="card-body">
+
+                        <h5>
+                            <i class="bi bi-pencil-square text-warning me-2"></i>
+                            Administración
+                        </h5>
+
+
+                        <p class="text-muted">
+                            Mantén actualizada la información
+                            de tus eventos.
+                        </p>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+
+    </main>
+
+
+
+
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
 </body>
+
 </html>
