@@ -55,7 +55,7 @@ public class EventoController {
 
     @GetMapping("/categoria/{categoria}")
     public String listarPorCategoria(
-            @PathVariable String categoria,
+            @PathVariable("categoria") String categoria,
             Model model) {
 
         model.addAttribute(
@@ -65,10 +65,9 @@ public class EventoController {
         return "eventos";
     }
 
-    // ESTE FALTABA
     @GetMapping("/{id:[0-9]+}")
     public String detalle(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             Model model) {
 
         Evento evento = service.buscarPorId(id).orElse(null);
@@ -84,7 +83,7 @@ public class EventoController {
 
     @GetMapping("/{id:[0-9]+}/editar")
     public String editar(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             Model model) {
 
         Evento evento = service.buscarPorId(id).orElse(null);
@@ -100,7 +99,7 @@ public class EventoController {
 
     @PostMapping("/{id:[0-9]+}")
     public String actualizar(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @Valid @ModelAttribute("evento") Evento evento,
             BindingResult result,
             RedirectAttributes ra) {
@@ -120,7 +119,7 @@ public class EventoController {
 
     @PostMapping("/{id:[0-9]+}/eliminar")
     public String eliminar(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             RedirectAttributes ra) {
 
         service.eliminar(id);
@@ -132,7 +131,7 @@ public class EventoController {
 
     @GetMapping("/categoria")
     public String buscarCategoria(
-            @RequestParam String categoria,
+            @RequestParam("categoria") String categoria,
             Model model) {
 
         model.addAttribute(
