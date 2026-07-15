@@ -1,5 +1,5 @@
-package com.ufide.practicas;
-
+package com.ufide.practicasemanal.service;
+/*
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
@@ -25,7 +25,7 @@ import com.google.firebase.cloud.StorageClient;
  * y la app sigue arrancando normalmente. Esto permite que los alumnos que no
  * hagan el bonus puedan correr la app sin errores.
  */
-@Service
+/*@Service
 public class FirebaseService {
 
     @Value("${firebase.bucket:}")
@@ -58,7 +58,7 @@ public class FirebaseService {
     /**
      * Sube el archivo a Firebase Storage y devuelve la URL publica.
      */
-    public String subir(MultipartFile file) throws IOException {
+   /* public String subir(MultipartFile file) throws IOException {
         if (!activo) {
             throw new IllegalStateException("FirebaseService no esta inicializado");
         }
@@ -69,4 +69,4 @@ public class FirebaseService {
         blob.createAcl(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER));
         return String.format("https://storage.googleapis.com/%s/%s", bucket, nombre);
     }
-}
+}*/

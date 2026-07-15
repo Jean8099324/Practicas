@@ -1,4 +1,4 @@
-package com.ufide.practicas;
+package com.ufide.practicasemanal.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
