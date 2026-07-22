@@ -4,46 +4,359 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cursos disponibles</title>
+
+    <title>Cursos | SC-403</title>
 
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet">
 
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+        rel="stylesheet">
+
+    <link
+        rel="stylesheet"
+        th:href="@{/css/styles.css}">
 </head>
 
 <body>
 
 <div th:replace="~{fragments/header :: navbar}"></div>
 
-<main class="container my-5">
+<main class="container my-4">
 
-    <h2>Cursos disponibles</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <ul class="list-group mt-3">
-        <li
-            class="list-group-item"
-            th:each="c : ${cursos}"
-            th:text="${c.nombre}">
-            Nombre del curso
-        </li>
-    </ul>
+        <div>
 
+            <h1 class="mb-1">
+                Cursos disponibles
+            </h1>
+
+            <p class="text-muted mb-0">
+
+                Total:
+
+                <span
+                    class="badge bg-primary"
+                    th:text="${cursos != null ? cursos.size() : 0}">
+                    0
+                </span>
+
+            </p>
+
+        </div>
+
+        <a
+            class="btn btn-primary"
+            th:href="@{/cursos/nuevo}">
+
+            <i class="bi bi-plus-circle me-1"></i>
+            Nuevo curso
+
+        </a>
+
+    </div>
+
+    <!-- Mensaje de error -->
+    <div
+        class="alert alert-danger alert-dismissible fade show"
+        role="alert"
+        th:if="${error}">
+
+        <i class="bi bi-exclamation-triangle me-2"></i>
+
+        <span th:text="${error}">
+            Ocurrió un error
+        </span>
+
+        <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Cerrar">
+        </button>
+
+    </div>
+
+    <!-- Tarjetas de cursos -->
+    <div class="row g-3">
+
+        <div
+            class="col-12 col-md-6 col-lg-4"
+            th:each="c, iter : ${cursos}">
+
+            <div class="card shadow-sm h-100 card-hover">
+
+                <div class="card-body d-flex flex-column">
+
+                    <div class="d-flex justify-content-between align-items-start">
+
+                        <span
+                            class="badge bg-secondary"
+                            th:text="'#' + ${iter.count}">
+                            #1
+                        </span>
+
+                        <span
+                            class="badge bg-info text-dark"
+                            th:text="${c.creditos} + ' créditos'">
+                            3 créditos
+                        </span>
+
+                    </div>
+
+                    <h5
+                        class="mt-3 brand-accent"
+                        th:text="${c.nombre}">
+                        Curso
+                    </h5>
+
+                    <p
+                        class="text-muted flex-grow-1"
+                        th:text="${c.descripcion}">
+                        Descripción
+                    </p>
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <small class="text-muted">
+
+                            <i class="bi bi-person-circle me-1"></i>
+
+                            <span th:text="${c.profesor}">
+                                Profesor
+                            </span>
+
+                        </small>
+
+                        <div class="btn-group btn-group-sm">
+
+                            <a
+                                class="btn btn-outline-primary"
+                                th:href="@{/cursos/{id}(id=${c.id})}">
+                                Ver
+                            </a>
+
+                            <a
+                                class="btn btn-outline-warning"
+                                th:href="@{/cursos/{id}/editar(id=${c.id})}"
+                                title="Editar curso">
+
+                                <i class="bi bi-pencil"></i>
+
+                            </a>
+
+                            <button
+                                type="button"
+                                class="btn btn-outline-danger btn-eliminar"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalEliminar"
+                                th:data-id="${c.id}"
+                                th:data-nombre="${c.nombre}"
+                                title="Eliminar curso">
+
+                                <i class="bi bi-trash"></i>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Mensaje cuando no hay cursos -->
     <div
         class="alert alert-warning mt-4"
         th:if="${cursos == null or cursos.isEmpty()}">
 
-        No hay cursos disponibles.
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        No hay cursos registrados.
+
     </div>
 
 </main>
 
 <footer th:replace="~{fragments/header :: footer}"></footer>
 
+<!-- Modal para confirmar eliminación -->
+<div
+    class="modal fade"
+    id="modalEliminar"
+    tabindex="-1"
+    aria-labelledby="tituloModalEliminar"
+    aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header bg-danger text-white">
+
+                <h5
+                    class="modal-title"
+                    id="tituloModalEliminar">
+
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Eliminar curso
+
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close btn-close-white"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <p class="mb-2">
+
+                    ¿Está seguro de eliminar el curso
+
+                    <strong id="nombreCursoEliminar">
+                        Curso
+                    </strong>?
+
+                </p>
+
+                <p class="text-muted small mb-0">
+                    Esta acción no se puede deshacer.
+                </p>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">
+
+                    Cancelar
+
+                </button>
+
+                <form
+                    id="formEliminar"
+                    method="post"
+                    th:action="@{/cursos/0/eliminar}">
+
+                    <button
+                        class="btn btn-danger"
+                        type="submit">
+
+                        <i class="bi bi-trash me-1"></i>
+                        Sí, eliminar
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Toast de éxito -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+
+    <div
+        id="toastOk"
+        class="toast align-items-center text-bg-success border-0"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+        th:if="${ok}">
+
+        <div class="d-flex">
+
+            <div class="toast-body">
+
+                <i class="bi bi-check-circle me-2"></i>
+
+                <span th:text="${ok}">
+                    Operación realizada correctamente
+                </span>
+
+            </div>
+
+            <button
+                type="button"
+                class="btn-close btn-close-white me-2 m-auto"
+                data-bs-dismiss="toast"
+                aria-label="Cerrar">
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
 </script>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const modalEliminar = document.getElementById("modalEliminar");
+
+        if (modalEliminar) {
+
+            modalEliminar.addEventListener("show.bs.modal", function (event) {
+
+                const boton = event.relatedTarget;
+
+                const id = boton.getAttribute("data-id");
+                const nombre = boton.getAttribute("data-nombre");
+
+                const nombreCurso = document.getElementById(
+                    "nombreCursoEliminar"
+                );
+
+                const formulario = document.getElementById(
+                    "formEliminar"
+                );
+
+                nombreCurso.textContent = nombre;
+
+                formulario.action =
+                    "/cursos/" + id + "/eliminar";
+            });
+        }
+
+        const toastElemento = document.getElementById("toastOk");
+
+        if (toastElemento) {
+
+            const toast = new bootstrap.Toast(
+                toastElemento,
+                {
+                    delay: 3500
+                }
+            );
+
+            toast.show();
+        }
+    });
+</script>
+
 </body>
+
 </html>
