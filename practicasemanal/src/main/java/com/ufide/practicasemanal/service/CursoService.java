@@ -25,8 +25,8 @@ public class CursoService {
         return repo.findById(id);
     }
 
-    public Curso guardar(Curso c) {
-        return repo.save(c);
+    public Curso guardar(Curso curso) {
+        return repo.save(curso);
     }
 
     public void eliminar(Long id) {

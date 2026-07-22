@@ -9,30 +9,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.ufide.practicasemanal.entity.Curso;
 import com.ufide.practicasemanal.service.CursoService;
 
-
 @Controller
 @RequestMapping("/cursos")
 public class CursoController {
 
-private final CursoService cursoService;
+        private final CursoService cursoService;
 
-public CursoController(CursoService cursoService) {
-        this.cursoService = cursoService;
-}
+        public CursoController(CursoService cursoService) {
+                this.cursoService = cursoService;
+        }
 
-@GetMapping
-public String listar(Model modelo) {
-        modelo.addAttribute("cursos", cursoService.listar());
-        return "cursos";
-}
+        @GetMapping
+        public String listar(Model modelo) {
+                modelo.addAttribute("cursos", cursoService.listar());
+                return "cursos";
+        }
 
-@GetMapping("/{id}")
-public String detalle(@PathVariable Long id, Model modelo) {
+        @GetMapping("/{id}")
+        public String detalle(@PathVariable Long id, Model modelo) {
 
-        Curso encontrado = cursoService.buscarPorId(id).orElse(null);
+                Curso encontrado = cursoService.buscarPorId(id).orElse(null);
 
-        modelo.addAttribute("curso", encontrado);
+                modelo.addAttribute("curso", encontrado);
 
-        return "curso";
-}
+                return "curso";
+        }
 }
