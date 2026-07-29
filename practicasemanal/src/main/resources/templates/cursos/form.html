@@ -63,11 +63,13 @@
                     Revisa los datos ingresados.
 
                     <ul class="mb-0 mt-2">
+
                         <li
                             th:each="error : ${#fields.allErrors()}"
                             th:text="${error}">
                             Error
                         </li>
+
                     </ul>
 
                 </div>
@@ -171,16 +173,27 @@
                             Profesor
                         </label>
 
-                        <input
+                        <select
                             id="profesor"
-                            type="text"
-                            class="form-control"
+                            class="form-select"
+                            th:field="*{profesor}"
                             th:classappend="${#fields.hasErrors('profesor')}
                                 ? 'is-invalid'
                                 : ''"
-                            th:field="*{profesor}"
-                            placeholder="Nombre del profesor"
                             required>
+
+                            <option value="">
+                                Seleccione un profesor
+                            </option>
+
+                            <option
+                                th:each="p : ${profesores}"
+                                th:value="${p.id}"
+                                th:text="${p.nombre}">
+                                Profesor
+                            </option>
+
+                        </select>
 
                         <div
                             class="invalid-feedback"
@@ -235,5 +248,6 @@
 </script>
 
 </body>
+
 </html>
 

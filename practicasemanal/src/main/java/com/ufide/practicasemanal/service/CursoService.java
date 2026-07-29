@@ -18,7 +18,11 @@ public class CursoService {
     }
 
     public List<Curso> listar() {
-        return repo.findAll();
+        return repo.findAllConProfesor();
+    }
+
+    public List<Curso> listarConProfesor() {
+        return repo.findAllConProfesor();
     }
 
     public Optional<Curso> buscarPorId(Long id) {

@@ -1,5 +1,6 @@
 package com.ufide.practicasemanal.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,6 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ufide.practicasemanal.entity.Curso;
 import com.ufide.practicasemanal.service.CursoService;
+import com.ufide.practicasemanal.service.ProfesorService;
 
 import jakarta.validation.Valid;
 
@@ -19,20 +21,36 @@ import jakarta.validation.Valid;
 @RequestMapping("/cursos")
 public class CursoController {
 
-        private final CursoService cursoService;
+        @Autowired
+        private CursoService cursoService;
 
-        public CursoController(CursoService cursoService) {
-                this.cursoService = cursoService;
-        }
+        @Autowired
+        private ProfesorService profesorService;
 
         @GetMapping
         public String listar(Model modelo) {
 
                 modelo.addAttribute(
                                 "cursos",
-                                cursoService.listar());
+                                cursoService.listarConProfesor());
 
                 return "cursos";
+        }
+
+        @GetMapping("/{id}")
+        public String detalle(
+                        Model modelo,
+                        @PathVariable Long id) {
+
+                Curso encontrado = cursoService
+                                .buscarPorId(id)
+                                .orElse(null);
+
+                modelo.addAttribute(
+                                "curso",
+                                encontrado);
+
+                return "curso";
         }
 
         @GetMapping("/nuevo")
@@ -42,6 +60,10 @@ public class CursoController {
                                 "curso",
                                 new Curso());
 
+                modelo.addAttribute(
+                                "profesores",
+                                profesorService.listar());
+
                 return "cursos/form";
         }
 
@@ -49,9 +71,15 @@ public class CursoController {
         public String guardar(
                         @Valid @ModelAttribute("curso") Curso curso,
                         BindingResult result,
-                        RedirectAttributes ra) {
+                        RedirectAttributes ra,
+                        Model modelo) {
 
                 if (result.hasErrors()) {
+
+                        modelo.addAttribute(
+                                        "profesores",
+                                        profesorService.listar());
+
                         return "cursos/form";
                 }
 
@@ -64,54 +92,22 @@ public class CursoController {
                 return "redirect:/cursos";
         }
 
-        @GetMapping("/{id}")
-        public String detalle(
-                        @PathVariable Long id,
-                        Model modelo,
-                        RedirectAttributes ra) {
-
-                Curso encontrado = cursoService
-                                .buscarPorId(id)
-                                .orElse(null);
-
-                if (encontrado == null) {
-
-                        ra.addFlashAttribute(
-                                        "error",
-                                        "Curso no encontrado");
-
-                        return "redirect:/cursos";
-                }
-
-                modelo.addAttribute(
-                                "curso",
-                                encontrado);
-
-                return "curso";
-        }
-
         @GetMapping("/{id}/editar")
         public String mostrarFormEditar(
                         @PathVariable Long id,
-                        Model modelo,
-                        RedirectAttributes ra) {
+                        Model modelo) {
 
                 Curso curso = cursoService
                                 .buscarPorId(id)
-                                .orElse(null);
-
-                if (curso == null) {
-
-                        ra.addFlashAttribute(
-                                        "error",
-                                        "Curso no encontrado");
-
-                        return "redirect:/cursos";
-                }
+                                .orElseThrow();
 
                 modelo.addAttribute(
                                 "curso",
                                 curso);
+
+                modelo.addAttribute(
+                                "profesores",
+                                profesorService.listar());
 
                 return "cursos/form";
         }
@@ -121,9 +117,15 @@ public class CursoController {
                         @PathVariable Long id,
                         @Valid @ModelAttribute("curso") Curso curso,
                         BindingResult result,
-                        RedirectAttributes ra) {
+                        RedirectAttributes ra,
+                        Model modelo) {
 
                 if (result.hasErrors()) {
+
+                        modelo.addAttribute(
+                                        "profesores",
+                                        profesorService.listar());
+
                         return "cursos/form";
                 }
 
