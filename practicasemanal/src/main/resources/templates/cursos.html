@@ -16,10 +16,12 @@
 
 <body>
 
+    <!-- Navbar reutilizable -->
     <div th:replace="~{fragments/header :: navbar}"></div>
 
     <main class="container my-4">
 
+        <!-- Encabezado -->
         <div class="d-flex justify-content-between align-items-center mb-4">
 
             <div>
@@ -98,7 +100,9 @@
 
                                 <i class="bi bi-person-circle me-1"></i>
 
-                                <span th:text="${c.profesor != null ? c.profesor.nombre : 'Sin profesor'}">
+                                <span th:text="${c.profesor != null
+                                        ? c.profesor.nombre
+                                        : 'Sin profesor'}">
                                     Profesor
                                 </span>
 
@@ -107,7 +111,9 @@
                             <div class="btn-group btn-group-sm">
 
                                 <a class="btn btn-outline-primary" th:href="@{/cursos/{id}(id=${c.id})}">
+
                                     Ver
+
                                 </a>
 
                                 <a class="btn btn-outline-warning" th:href="@{/cursos/{id}/editar(id=${c.id})}"
@@ -147,9 +153,10 @@
 
     </main>
 
+    <!-- Footer reutilizable -->
     <footer th:replace="~{fragments/header :: footer}"></footer>
 
-    <!-- Modal para confirmar eliminación -->
+    <!-- Modal de eliminación -->
     <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="tituloModalEliminar" aria-hidden="true">
 
         <div class="modal-dialog modal-dialog-centered">
@@ -213,34 +220,7 @@
 
         </div>
 
-    </div>
-
-    <!-- Toast de éxito -->
-    <div class="toast-container position-fixed bottom-0 end-0 p-3">
-
-        <div id="toastOk" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive"
-            aria-atomic="true" th:if="${ok}">
-
-            <div class="d-flex">
-
-                <div class="toast-body">
-
-                    <i class="bi bi-check-circle me-2"></i>
-
-                    <span th:text="${ok}">
-                        Operación realizada correctamente
-                    </span>
-
-                </div>
-
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                    aria-label="Cerrar">
-                </button>
-
-            </div>
-
-        </div>
-
+        
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
@@ -249,45 +229,54 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
-            const modalEliminar = document.getElementById("modalEliminar");
+            const modalEliminar =
+                document.getElementById("modalEliminar");
 
-            if (modalEliminar) {
+            if (!modalEliminar) {
+                return;
+            }
 
-                modalEliminar.addEventListener("show.bs.modal", function (event) {
+            modalEliminar.addEventListener(
+                "show.bs.modal",
+                function (event) {
 
                     const boton = event.relatedTarget;
 
-                    const id = boton.getAttribute("data-id");
-                    const nombre = boton.getAttribute("data-nombre");
-
-                    const nombreCurso = document.getElementById(
-                        "nombreCursoEliminar"
-                    );
-
-                    const formulario = document.getElementById(
-                        "formEliminar"
-                    );
-
-                    nombreCurso.textContent = nombre;
-
-                    formulario.action =
-                        "/cursos/" + id + "/eliminar";
-                });
-            }
-
-            const toastElemento = document.getElementById("toastOk");
-
-            if (toastElemento) {
-
-                const toast = new bootstrap.Toast(
-                    toastElemento,
-                    {
-                        delay: 3500
+                    if (!boton) {
+                        return;
                     }
-                );
 
-                toast.show();
-            }
+                    const id =
+                        boton.getAttribute("data-id");
+
+                    const nombre =
+                        boton.getAttribute("data-nombre");
+
+                    const nombreCurso =
+                        document.getElementById(
+                            "nombreCursoEliminar"
+                        );
+
+                    const formulario =
+                        document.getElementById(
+                            "formEliminar"
+                        );
+
+                    if (nombreCurso) {
+                        nombreCurso.textContent =
+                            nombre || "Curso";
+                    }
+
+                    if (formulario && id) {
+                        formulario.action =
+                            "/cursos/" +
+                            encodeURIComponent(id) +
+                            "/eliminar";
+                    }
+
+                }
+            );
+
         });
     </script>
 

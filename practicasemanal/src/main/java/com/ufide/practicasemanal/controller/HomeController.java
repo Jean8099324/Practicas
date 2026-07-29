@@ -9,10 +9,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class HomeController {
 
     @GetMapping("/")
-    public String home(Model modelo,
+    public String home(
+            Model modelo,
             @RequestParam(defaultValue = "Estudiante") String nombre) {
+
         modelo.addAttribute("nombre", nombre);
-        modelo.addAttribute("curso", "SC-403 Desarrollo de Aplicaciones Web");
+        modelo.addAttribute(
+                "curso",
+                "SC-403 Desarrollo de Aplicaciones Web");
+
         return "home";
+    }
+
+    @GetMapping("/login")
+    public String login() {
+        return "login";
     }
 }
