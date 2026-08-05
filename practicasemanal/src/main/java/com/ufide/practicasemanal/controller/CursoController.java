@@ -1,6 +1,7 @@
 package com.ufide.practicasemanal.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,6 +28,9 @@ public class CursoController {
         @Autowired
         private ProfesorService profesorService;
 
+        /*
+         * Cualquier usuario autenticado puede listar los cursos.
+         */
         @GetMapping
         public String listar(Model modelo) {
 
@@ -37,6 +41,9 @@ public class CursoController {
                 return "cursos";
         }
 
+        /*
+         * Cualquier usuario autenticado puede ver el detalle.
+         */
         @GetMapping("/{id}")
         public String detalle(
                         Model modelo,
@@ -53,6 +60,10 @@ public class CursoController {
                 return "curso";
         }
 
+        /*
+         * Solo ADMIN puede abrir el formulario para crear.
+         */
+        @PreAuthorize("hasRole('ADMIN')")
         @GetMapping("/nuevo")
         public String mostrarFormNuevo(Model modelo) {
 
@@ -67,6 +78,10 @@ public class CursoController {
                 return "cursos/form";
         }
 
+        /*
+         * Solo ADMIN puede guardar cursos nuevos.
+         */
+        @PreAuthorize("hasRole('ADMIN')")
         @PostMapping
         public String guardar(
                         @Valid @ModelAttribute("curso") Curso curso,
@@ -92,6 +107,10 @@ public class CursoController {
                 return "redirect:/cursos";
         }
 
+        /*
+         * Solo ADMIN puede abrir el formulario para editar.
+         */
+        @PreAuthorize("hasRole('ADMIN')")
         @GetMapping("/{id}/editar")
         public String mostrarFormEditar(
                         @PathVariable Long id,
@@ -112,6 +131,10 @@ public class CursoController {
                 return "cursos/form";
         }
 
+        /*
+         * Solo ADMIN puede actualizar cursos.
+         */
+        @PreAuthorize("hasRole('ADMIN')")
         @PostMapping("/{id}")
         public String actualizar(
                         @PathVariable Long id,
@@ -140,6 +163,13 @@ public class CursoController {
                 return "redirect:/cursos";
         }
 
+        /*
+         * Solo ADMIN puede eliminar cursos.
+         *
+         * hasAuthority("ROLE_ADMIN") produce el mismo resultado
+         * que hasRole("ADMIN").
+         */
+        @PreAuthorize("hasAuthority('ROLE_ADMIN')")
         @PostMapping("/{id}/eliminar")
         public String eliminar(
                         @PathVariable Long id,
