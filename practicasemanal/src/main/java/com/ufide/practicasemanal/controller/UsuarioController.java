@@ -24,423 +24,430 @@ import jakarta.validation.Valid;
 @PreAuthorize("hasRole('ADMIN')")
 public class UsuarioController {
 
-    private final UsuarioService usuarioService;
+        private final UsuarioService usuarioService;
 
-    public UsuarioController(UsuarioService usuarioService) {
-        this.usuarioService = usuarioService;
-    }
-
-    /**
-     * Lista todos los usuarios.
-     */
-    @GetMapping
-    public String listar(Model modelo) {
-
-        modelo.addAttribute(
-                "usuarios",
-                usuarioService.listar());
-
-        return "usuarios";
-    }
-
-    /**
-     * Muestra el formulario para registrar un usuario nuevo.
-     */
-    @GetMapping("/nuevo")
-    public String mostrarFormularioNuevo(Model modelo) {
-
-        Usuario usuario = new Usuario();
-        usuario.setRol("USER");
-
-        modelo.addAttribute("usuario", usuario);
-        modelo.addAttribute("modoEdicion", false);
-
-        return "usuarios/formulario";
-    }
-
-    /**
-     * Guarda un usuario nuevo.
-     */
-    @PostMapping("/guardar")
-    public String guardar(
-            @Valid @ModelAttribute("usuario") Usuario usuario,
-            BindingResult resultado,
-            Model modelo,
-            RedirectAttributes redirectAttributes) {
-
-        normalizarDatos(usuario);
-
-        validarDuplicadosAlCrear(usuario, resultado);
-
-        if (resultado.hasErrors()) {
-
-            modelo.addAttribute("modoEdicion", false);
-
-            return "usuarios/formulario";
+        public UsuarioController(UsuarioService usuarioService) {
+                this.usuarioService = usuarioService;
         }
 
-        try {
-
-            usuarioService.guardar(usuario);
-
-            redirectAttributes.addFlashAttribute(
-                    "ok",
-                    "Usuario creado correctamente.");
-
-            return "redirect:/usuarios";
-
-        } catch (IllegalArgumentException exception) {
-
-            resultado.reject(
-                    "usuario.error",
-                    exception.getMessage());
-
-            modelo.addAttribute("modoEdicion", false);
-
-            return "usuarios/formulario";
-
-        } catch (Exception exception) {
-
-            resultado.reject(
-                    "usuario.error",
-                    "No fue posible guardar el usuario.");
-
-            modelo.addAttribute("modoEdicion", false);
-
-            return "usuarios/formulario";
-        }
-    }
-
-    /**
-     * Muestra el formulario para editar un usuario.
-     */
-    @GetMapping("/{id}/editar")
-    public String mostrarFormularioEditar(
-            @PathVariable Long id,
-            Model modelo,
-            RedirectAttributes redirectAttributes) {
-
-        Optional<Usuario> usuarioOptional = usuarioService.buscarPorId(id);
-
-        if (usuarioOptional.isEmpty()) {
-
-            redirectAttributes.addFlashAttribute(
-                    "error",
-                    "El usuario solicitado no existe.");
-
-            return "redirect:/usuarios";
-        }
-
-        Usuario usuario = usuarioOptional.get();
-
-        /*
-         * No se muestra el hash BCrypt en el formulario.
-         * Si la contraseña se deja vacía, el servicio conserva
-         * la contraseña existente.
+        /**
+         * Lista todos los usuarios.
          */
-        usuario.setPassword("");
+        @GetMapping
+        public String listar(Model modelo) {
 
-        modelo.addAttribute("usuario", usuario);
-        modelo.addAttribute("modoEdicion", true);
+                modelo.addAttribute(
+                                "usuarios",
+                                usuarioService.listar());
 
-        return "usuarios/formulario";
-    }
-
-    /**
-     * Actualiza un usuario existente.
-     */
-    @PostMapping("/{id}")
-    public String actualizar(
-            @PathVariable Long id,
-            @ModelAttribute("usuario") Usuario usuario,
-            BindingResult resultado,
-            Model modelo,
-            RedirectAttributes redirectAttributes) {
-
-        Optional<Usuario> usuarioExistenteOptional = usuarioService.buscarPorId(id);
-
-        if (usuarioExistenteOptional.isEmpty()) {
-
-            redirectAttributes.addFlashAttribute(
-                    "error",
-                    "El usuario solicitado no existe.");
-
-            return "redirect:/usuarios";
+                return "usuarios";
         }
 
-        normalizarDatos(usuario);
+        /**
+         * Muestra el formulario para crear un usuario.
+         */
+        @GetMapping("/nuevo")
+        public String mostrarFormularioNuevo(Model modelo) {
 
-        validarCamposActualizacion(usuario, resultado);
+                Usuario usuario = new Usuario();
 
-        validarDuplicadosAlEditar(
-                id,
-                usuario,
-                resultado);
+                usuario.setRol("USER");
 
-        if (resultado.hasErrors()) {
+                modelo.addAttribute("usuario", usuario);
+                modelo.addAttribute("modoEdicion", false);
 
-            usuario.setId(id);
-
-            modelo.addAttribute("modoEdicion", true);
-
-            return "usuarios/formulario";
+                return "usuarios/form";
         }
 
-        try {
+        /**
+         * Guarda un usuario nuevo.
+         */
+        @PostMapping("/guardar")
+        public String guardar(
+                        @Valid @ModelAttribute("usuario") Usuario usuario,
+                        BindingResult resultado,
+                        Model modelo,
+                        RedirectAttributes redirectAttributes) {
 
-            usuarioService.actualizar(id, usuario);
+                normalizarDatos(usuario);
 
-            redirectAttributes.addFlashAttribute(
-                    "ok",
-                    "Usuario actualizado correctamente.");
+                validarDuplicadosAlCrear(
+                                usuario,
+                                resultado);
 
-            return "redirect:/usuarios";
+                if (resultado.hasErrors()) {
 
-        } catch (IllegalArgumentException exception) {
+                        modelo.addAttribute("modoEdicion", false);
 
-            resultado.reject(
-                    "usuario.error",
-                    exception.getMessage());
+                        return "usuarios/form";
+                }
 
-            usuario.setId(id);
+                try {
 
-            modelo.addAttribute("modoEdicion", true);
+                        usuarioService.guardar(usuario);
 
-            return "usuarios/formulario";
+                        redirectAttributes.addFlashAttribute(
+                                        "ok",
+                                        "Usuario creado correctamente.");
 
-        } catch (Exception exception) {
+                        return "redirect:/usuarios";
 
-            resultado.reject(
-                    "usuario.error",
-                    "No fue posible actualizar el usuario.");
+                } catch (IllegalArgumentException exception) {
 
-            usuario.setId(id);
+                        resultado.reject(
+                                        "usuario.error",
+                                        exception.getMessage());
 
-            modelo.addAttribute("modoEdicion", true);
+                        modelo.addAttribute("modoEdicion", false);
 
-            return "usuarios/formulario";
-        }
-    }
+                        return "usuarios/form";
 
-    /**
-     * Elimina un usuario.
-     *
-     * Se impide eliminar la misma cuenta que mantiene
-     * la sesión iniciada.
-     */
-    @PostMapping("/{id}/eliminar")
-    public String eliminar(
-            @PathVariable Long id,
-            Authentication authentication,
-            RedirectAttributes redirectAttributes) {
+                } catch (Exception exception) {
 
-        Optional<Usuario> usuarioOptional = usuarioService.buscarPorId(id);
+                        resultado.reject(
+                                        "usuario.error",
+                                        "No fue posible guardar el usuario.");
 
-        if (usuarioOptional.isEmpty()) {
+                        modelo.addAttribute("modoEdicion", false);
 
-            redirectAttributes.addFlashAttribute(
-                    "error",
-                    "El usuario solicitado no existe.");
-
-            return "redirect:/usuarios";
+                        return "usuarios/form";
+                }
         }
 
-        Usuario usuario = usuarioOptional.get();
+        /**
+         * Muestra el formulario para editar un usuario.
+         */
+        @GetMapping("/{id}/editar")
+        public String mostrarFormularioEditar(
+                        @PathVariable Long id,
+                        Model modelo,
+                        RedirectAttributes redirectAttributes) {
 
-        if (authentication != null
-                && authentication.isAuthenticated()
-                && usuario.getUsername()
-                        .equals(authentication.getName())) {
+                Optional<Usuario> usuarioOptional = usuarioService.buscarPorId(id);
 
-            redirectAttributes.addFlashAttribute(
-                    "error",
-                    "No puedes eliminar tu propio usuario "
-                            + "mientras tienes la sesión iniciada.");
+                if (usuarioOptional.isEmpty()) {
 
-            return "redirect:/usuarios";
+                        redirectAttributes.addFlashAttribute(
+                                        "error",
+                                        "El usuario solicitado no existe.");
+
+                        return "redirect:/usuarios";
+                }
+
+                Usuario usuario = usuarioOptional.get();
+
+                /*
+                 * No se debe mostrar el hash BCrypt.
+                 * Si el campo queda vacío, se conserva
+                 * la contraseña actual.
+                 */
+                usuario.setPassword("");
+
+                modelo.addAttribute("usuario", usuario);
+                modelo.addAttribute("modoEdicion", true);
+
+                return "usuarios/form";
         }
 
-        try {
+        /**
+         * Actualiza un usuario existente.
+         */
+        @PostMapping("/{id}")
+        public String actualizar(
+                        @PathVariable Long id,
+                        @ModelAttribute("usuario") Usuario usuario,
+                        BindingResult resultado,
+                        Model modelo,
+                        RedirectAttributes redirectAttributes) {
 
-            usuarioService.eliminar(id);
+                Optional<Usuario> usuarioExistenteOptional = usuarioService.buscarPorId(id);
 
-            redirectAttributes.addFlashAttribute(
-                    "ok",
-                    "Usuario eliminado correctamente.");
+                if (usuarioExistenteOptional.isEmpty()) {
 
-        } catch (IllegalArgumentException exception) {
+                        redirectAttributes.addFlashAttribute(
+                                        "error",
+                                        "El usuario solicitado no existe.");
 
-            redirectAttributes.addFlashAttribute(
-                    "error",
-                    exception.getMessage());
+                        return "redirect:/usuarios";
+                }
 
-        } catch (Exception exception) {
+                normalizarDatos(usuario);
 
-            redirectAttributes.addFlashAttribute(
-                    "error",
-                    "No fue posible eliminar el usuario.");
+                validarCamposActualizacion(
+                                usuario,
+                                resultado);
+
+                validarDuplicadosAlEditar(
+                                id,
+                                usuario,
+                                resultado);
+
+                if (resultado.hasErrors()) {
+
+                        usuario.setId(id);
+
+                        modelo.addAttribute("modoEdicion", true);
+
+                        return "usuarios/form";
+                }
+
+                try {
+
+                        usuarioService.actualizar(
+                                        id,
+                                        usuario);
+
+                        redirectAttributes.addFlashAttribute(
+                                        "ok",
+                                        "Usuario actualizado correctamente.");
+
+                        return "redirect:/usuarios";
+
+                } catch (IllegalArgumentException exception) {
+
+                        resultado.reject(
+                                        "usuario.error",
+                                        exception.getMessage());
+
+                        usuario.setId(id);
+
+                        modelo.addAttribute("modoEdicion", true);
+
+                        return "usuarios/form";
+
+                } catch (Exception exception) {
+
+                        resultado.reject(
+                                        "usuario.error",
+                                        "No fue posible actualizar el usuario.");
+
+                        usuario.setId(id);
+
+                        modelo.addAttribute("modoEdicion", true);
+
+                        return "usuarios/form";
+                }
         }
 
-        return "redirect:/usuarios";
-    }
+        /**
+         * Elimina un usuario.
+         *
+         * No permite eliminar la cuenta que tiene
+         * la sesión iniciada.
+         */
+        @PostMapping("/{id}/eliminar")
+        public String eliminar(
+                        @PathVariable Long id,
+                        Authentication authentication,
+                        RedirectAttributes redirectAttributes) {
 
-    /**
-     * Elimina espacios innecesarios antes de validar.
-     */
-    private void normalizarDatos(Usuario usuario) {
+                Optional<Usuario> usuarioOptional = usuarioService.buscarPorId(id);
 
-        if (usuario.getUsername() != null) {
-            usuario.setUsername(
-                    usuario.getUsername().trim());
+                if (usuarioOptional.isEmpty()) {
+
+                        redirectAttributes.addFlashAttribute(
+                                        "error",
+                                        "El usuario solicitado no existe.");
+
+                        return "redirect:/usuarios";
+                }
+
+                Usuario usuario = usuarioOptional.get();
+
+                if (authentication != null
+                                && authentication.isAuthenticated()
+                                && usuario.getUsername()
+                                                .equals(authentication.getName())) {
+
+                        redirectAttributes.addFlashAttribute(
+                                        "error",
+                                        "No puedes eliminar tu propio usuario "
+                                                        + "mientras tienes la sesión iniciada.");
+
+                        return "redirect:/usuarios";
+                }
+
+                try {
+
+                        usuarioService.eliminar(id);
+
+                        redirectAttributes.addFlashAttribute(
+                                        "ok",
+                                        "Usuario eliminado correctamente.");
+
+                } catch (IllegalArgumentException exception) {
+
+                        redirectAttributes.addFlashAttribute(
+                                        "error",
+                                        exception.getMessage());
+
+                } catch (Exception exception) {
+
+                        redirectAttributes.addFlashAttribute(
+                                        "error",
+                                        "No fue posible eliminar el usuario.");
+                }
+
+                return "redirect:/usuarios";
         }
 
-        if (usuario.getEmail() != null) {
-            usuario.setEmail(
-                    usuario.getEmail()
-                            .trim()
-                            .toLowerCase());
+        /**
+         * Limpia espacios y normaliza datos.
+         */
+        private void normalizarDatos(Usuario usuario) {
+
+                if (usuario == null) {
+                        return;
+                }
+
+                if (usuario.getUsername() != null) {
+
+                        usuario.setUsername(
+                                        usuario.getUsername().trim());
+                }
+
+                if (usuario.getEmail() != null) {
+
+                        usuario.setEmail(
+                                        usuario.getEmail()
+                                                        .trim()
+                                                        .toLowerCase());
+                }
+
+                if (usuario.getRol() != null) {
+
+                        usuario.setRol(
+                                        usuario.getRol()
+                                                        .trim()
+                                                        .toUpperCase());
+                }
         }
 
-        if (usuario.getRol() != null) {
-            usuario.setRol(
-                    usuario.getRol()
-                            .trim()
-                            .toUpperCase());
-        }
-    }
+        /**
+         * Verifica duplicados al crear.
+         */
+        private void validarDuplicadosAlCrear(
+                        Usuario usuario,
+                        BindingResult resultado) {
 
-    /**
-     * Valida duplicados al registrar.
-     */
-    private void validarDuplicadosAlCrear(
-            Usuario usuario,
-            BindingResult resultado) {
+                if (usuario.getUsername() != null
+                                && !usuario.getUsername().isBlank()
+                                && usuarioService.existeUsername(
+                                                usuario.getUsername())) {
 
-        if (usuario.getUsername() != null
-                && !usuario.getUsername().isBlank()
-                && usuarioService.existeUsername(
-                        usuario.getUsername())) {
+                        resultado.rejectValue(
+                                        "username",
+                                        "username.duplicado",
+                                        "Ya existe un usuario con ese username.");
+                }
 
-            resultado.rejectValue(
-                    "username",
-                    "username.duplicado",
-                    "Ya existe un usuario con ese username.");
-        }
+                if (usuario.getEmail() != null
+                                && !usuario.getEmail().isBlank()
+                                && usuarioService.existeEmail(
+                                                usuario.getEmail())) {
 
-        if (usuario.getEmail() != null
-                && !usuario.getEmail().isBlank()
-                && usuarioService.existeEmail(
-                        usuario.getEmail())) {
-
-            resultado.rejectValue(
-                    "email",
-                    "email.duplicado",
-                    "Ya existe un usuario con ese correo.");
-        }
-    }
-
-    /**
-     * Valida los campos requeridos durante la edición.
-     *
-     * La contraseña no es obligatoria al editar porque,
-     * si queda vacía, se conserva la actual.
-     */
-    private void validarCamposActualizacion(
-            Usuario usuario,
-            BindingResult resultado) {
-
-        if (usuario.getUsername() == null
-                || usuario.getUsername().isBlank()) {
-
-            resultado.rejectValue(
-                    "username",
-                    "username.obligatorio",
-                    "El username es obligatorio.");
+                        resultado.rejectValue(
+                                        "email",
+                                        "email.duplicado",
+                                        "Ya existe un usuario con ese correo.");
+                }
         }
 
-        if (usuario.getEmail() == null
-                || usuario.getEmail().isBlank()) {
+        /**
+         * Valida los campos durante la edición.
+         */
+        private void validarCamposActualizacion(
+                        Usuario usuario,
+                        BindingResult resultado) {
 
-            resultado.rejectValue(
-                    "email",
-                    "email.obligatorio",
-                    "El correo electrónico es obligatorio.");
+                if (usuario.getUsername() == null
+                                || usuario.getUsername().isBlank()) {
+
+                        resultado.rejectValue(
+                                        "username",
+                                        "username.obligatorio",
+                                        "El username es obligatorio.");
+                }
+
+                if (usuario.getEmail() == null
+                                || usuario.getEmail().isBlank()) {
+
+                        resultado.rejectValue(
+                                        "email",
+                                        "email.obligatorio",
+                                        "El correo electrónico es obligatorio.");
+                }
+
+                if (usuario.getRol() == null
+                                || usuario.getRol().isBlank()) {
+
+                        resultado.rejectValue(
+                                        "rol",
+                                        "rol.obligatorio",
+                                        "El rol es obligatorio.");
+
+                } else if (!usuario.getRol().equals("ADMIN")
+                                && !usuario.getRol().equals("USER")) {
+
+                        resultado.rejectValue(
+                                        "rol",
+                                        "rol.invalido",
+                                        "El rol debe ser ADMIN o USER.");
+                }
+
+                if (usuario.getPassword() != null
+                                && !usuario.getPassword().isBlank()
+                                && usuario.getPassword().length() < 8) {
+
+                        resultado.rejectValue(
+                                        "password",
+                                        "password.longitud",
+                                        "La contraseña debe tener al menos 8 caracteres.");
+                }
         }
 
-        if (usuario.getRol() == null
-                || usuario.getRol().isBlank()) {
+        /**
+         * Verifica duplicados al editar.
+         */
+        private void validarDuplicadosAlEditar(
+                        Long id,
+                        Usuario usuario,
+                        BindingResult resultado) {
 
-            resultado.rejectValue(
-                    "rol",
-                    "rol.obligatorio",
-                    "El rol es obligatorio.");
+                if (usuario.getUsername() != null
+                                && !usuario.getUsername().isBlank()) {
+
+                        Optional<Usuario> usuarioPorUsername = usuarioService.buscarPorUsername(
+                                        usuario.getUsername());
+
+                        if (usuarioPorUsername.isPresent()
+                                        && !usuarioPorUsername.get()
+                                                        .getId()
+                                                        .equals(id)) {
+
+                                resultado.rejectValue(
+                                                "username",
+                                                "username.duplicado",
+                                                "Ya existe otro usuario con ese username.");
+                        }
+                }
+
+                if (usuario.getEmail() != null
+                                && !usuario.getEmail().isBlank()) {
+
+                        Optional<Usuario> usuarioPorEmail = usuarioService.buscarPorEmail(
+                                        usuario.getEmail());
+
+                        if (usuarioPorEmail.isPresent()
+                                        && !usuarioPorEmail.get()
+                                                        .getId()
+                                                        .equals(id)) {
+
+                                resultado.rejectValue(
+                                                "email",
+                                                "email.duplicado",
+                                                "Ya existe otro usuario con ese correo.");
+                        }
+                }
         }
-
-        if (usuario.getRol() != null
-                && !usuario.getRol().isBlank()
-                && !usuario.getRol().equals("ADMIN")
-                && !usuario.getRol().equals("USER")) {
-
-            resultado.rejectValue(
-                    "rol",
-                    "rol.invalido",
-                    "El rol debe ser ADMIN o USER.");
-        }
-
-        if (usuario.getPassword() != null
-                && !usuario.getPassword().isBlank()
-                && usuario.getPassword().length() < 8) {
-
-            resultado.rejectValue(
-                    "password",
-                    "password.longitud",
-                    "La contraseña debe tener al menos 8 caracteres.");
-        }
-    }
-
-    /**
-     * Valida que el username y el email no pertenezcan
-     * a otro usuario durante la edición.
-     */
-    private void validarDuplicadosAlEditar(
-            Long id,
-            Usuario usuario,
-            BindingResult resultado) {
-
-        if (usuario.getUsername() != null
-                && !usuario.getUsername().isBlank()) {
-
-            Optional<Usuario> usuarioPorUsername = usuarioService.buscarPorUsername(
-                    usuario.getUsername());
-
-            if (usuarioPorUsername.isPresent()
-                    && !usuarioPorUsername.get()
-                            .getId()
-                            .equals(id)) {
-
-                resultado.rejectValue(
-                        "username",
-                        "username.duplicado",
-                        "Ya existe otro usuario con ese username.");
-            }
-        }
-
-        if (usuario.getEmail() != null
-                && !usuario.getEmail().isBlank()) {
-
-            Optional<Usuario> usuarioPorEmail = usuarioService.buscarPorEmail(
-                    usuario.getEmail());
-
-            if (usuarioPorEmail.isPresent()
-                    && !usuarioPorEmail.get()
-                            .getId()
-                            .equals(id)) {
-
-                resultado.rejectValue(
-                        "email",
-                        "email.duplicado",
-                        "Ya existe otro usuario con ese correo.");
-            }
-        }
-    }
 }

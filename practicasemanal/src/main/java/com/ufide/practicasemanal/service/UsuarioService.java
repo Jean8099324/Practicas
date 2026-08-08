@@ -1,6 +1,7 @@
 package com.ufide.practicasemanal.service;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ufide.practicasemanal.entity.Usuario;
 import com.ufide.practicasemanal.repository.UsuarioRepository;
+import com.ufide.practicasemanal.security.Rol;
 
 @Service
 public class UsuarioService {
@@ -294,24 +296,29 @@ public class UsuarioService {
             throw new IllegalArgumentException(
                     "La contraseña es obligatoria.");
         }
+
+        normalizarRol(usuario.getRol());
     }
 
     private String normalizarRol(String rol) {
 
         if (rol == null || rol.isBlank()) {
-            return "USER";
+            return Rol.USER.name();
         }
 
-        String rolNormalizado = rol.trim().toUpperCase();
+        try {
 
-        if (!rolNormalizado.equals("ADMIN")
-                && !rolNormalizado.equals("USER")) {
+            return Rol.valueOf(
+                    rol.trim().toUpperCase()).name();
+
+        } catch (IllegalArgumentException exception) {
 
             throw new IllegalArgumentException(
-                    "El rol debe ser ADMIN o USER.");
+                    "Rol inválido: "
+                            + rol
+                            + ". Debe ser uno de: "
+                            + Arrays.toString(Rol.values()));
         }
-
-        return rolNormalizado;
     }
 
     private boolean esPasswordBCrypt(String password) {

@@ -1,0 +1,35 @@
+<button onclick="consultar()">
+    Consultar cursos
+</button>
+
+<pre id="resultado"></pre>
+
+<script>
+    async function consultar() {
+
+        try {
+
+            const respuesta = await fetch(
+                "http://localhost:8080/api/cursos",
+                {
+                    credentials: "include"
+                }
+            );
+
+            const datos = await respuesta.json();
+
+            document.getElementById("resultado").textContent =
+                JSON.stringify(datos, null, 2);
+
+            console.log(datos);
+
+        } catch (e) {
+
+            document.getElementById("resultado").textContent =
+                e;
+
+            console.error(e);
+        }
+
+    }
+</script>
