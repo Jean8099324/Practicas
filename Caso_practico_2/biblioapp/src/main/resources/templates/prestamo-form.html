@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Registrar préstamo - BiblioApp</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="container mt-4">
+
+        <h1 class="mb-4">Registrar préstamo</h1>
+
+        <form th:action="@{/prestamos}" method="post">
+
+            <div class="mb-3">
+                <label for="libroId" class="form-label">
+                    Libro
+                </label>
+
+                <select id="libroId" name="libroId" class="form-select" required>
+
+                    <option value="">
+                        Seleccione un libro
+                    </option>
+
+                    <option th:each="libro : ${libros}" th:value="${libro.id}"
+                        th:text="${libro.titulo + ' - Disponibles: ' + libro.copiasDisponibles}">
+                    </option>
+
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="usuarioId" class="form-label">
+                    Usuario
+                </label>
+
+                <select id="usuarioId" name="usuarioId" class="form-select" required>
+
+                    <option value="">
+                        Seleccione un usuario
+                    </option>
+
+                    <option th:each="usuario : ${usuarios}" th:value="${usuario.id}"
+                        th:text="${usuario.nombreCompleto + ' (' + usuario.username + ')'}">
+                    </option>
+
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Registrar préstamo
+            </button>
+
+            <a th:href="@{/prestamos}" class="btn btn-secondary">
+                Cancelar
+            </a>
+
+        </form>
+
+    </div>
+
+</body>
+
+</html>
